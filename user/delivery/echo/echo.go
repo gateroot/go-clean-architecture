@@ -5,12 +5,12 @@ import (
 	"awesomeProject1/user"
 	"awesomeProject1/user/delivery"
 	"fmt"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
 	"net/http"
 	"strconv"
-)
 
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+)
 
 type userDelivery struct {
 	uc user.UserUsecase

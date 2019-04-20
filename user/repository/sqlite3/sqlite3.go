@@ -11,28 +11,11 @@ type userRepository struct {
 	sqlClient *sql.DB
 }
 
-func NewUserRepository() *userRepository {
-	db, err := sql.Open("sqlite3", "./test.db")
-	if err != nil {
-		panic(err)
-	}
-
-	q := `
-		CREATE TABLE IF NOT EXISTS USERS (
-			ID INTEGER PRIMARY KEY AUTOINCREMENT,
-			NAME VARCHAR(100) NOT NULL
-		)
-	`
-
-	_, err = db.Exec(q)
-	if err != nil {
-		panic(err)
-	}
-
-	return &userRepository{db}
+func NewUserRepository(db *sql.DB) userRepository {
+	return userRepository{db}
 }
 
-func (ur *userRepository) Get(userID int) (*model.User, error) {
+func (ur userRepository) Get(userID int) (*model.User, error) {
 	row := ur.sqlClient.QueryRow(`SELECT * FROM USERS WHERE ID=?`, userID)
 	var id int
 	var name string
@@ -46,7 +29,7 @@ func (ur *userRepository) Get(userID int) (*model.User, error) {
 	}, nil
 }
 
-func (ur *userRepository) Add(user *model.User) (*model.User, error) {
+func (ur userRepository) Add(user *model.User) (*model.User, error) {
 	result, err := ur.sqlClient.Exec(`INSERT INTO USERS (NAME) VALUES (?)`, user.Name)
 	if err != nil {
 		return nil, err
@@ -62,12 +45,12 @@ func (ur *userRepository) Add(user *model.User) (*model.User, error) {
 	return user, nil
 }
 
-func (ur *userRepository) Edit(user *model.User) error {
+func (ur userRepository) Edit(user *model.User) error {
 	_, err := ur.sqlClient.Exec(`UPDATE USERS SET NAME=? WHERE ID=?`, user.Name, user.Id)
 	return err
 }
 
-func (ur *userRepository) Delete(userID int) error {
+func (ur userRepository) Delete(userID int) error {
 	_, err := ur.sqlClient.Exec(`DELETE FROM USERS WHERE ID=?`, userID)
 	return err
 }
